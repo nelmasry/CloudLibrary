@@ -8,4 +8,4 @@ Solution has 3 projects:
 
 Console app should be run to consume CloudLibrary class library by creating resources in different environments like UAT,Prod..etc and waiting few seconds before deleting some of the infrastructure created
 
-**hint.** Current initial path for creating infrastructure folders is "D:\CloudInfra", please change it in console (Program.cs) in case change needed
+**hint.** Current initial path for creating infrastructure folders is "D:\CloudInfra", please change it in appsettings.json file in case change needed. 
