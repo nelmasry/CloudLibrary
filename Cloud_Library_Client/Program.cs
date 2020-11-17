@@ -6,6 +6,7 @@ using CloudLibrary.API.Service;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Threading;
+using Microsoft.Extensions.Configuration;
 
 namespace Cloud_Library_Client
 {
@@ -13,15 +14,13 @@ namespace Cloud_Library_Client
     {
         static void Main(string[] args)
         {
-            var serviceProvider = new ServiceCollection()
-            .AddCloudLibraryDI()
-            .BuildServiceProvider();
+            string cloudInfraPath;
+            ICloudProviderFactory _cloudProviderFactory;
+            ConfigureServices(out cloudInfraPath, out _cloudProviderFactory);
 
-            var _cloudProviderFactory = serviceProvider.GetService<ICloudProviderFactory>();
+            IGSCloudService _IGSCloudService = new IGSCloudService(_cloudProviderFactory, cloudInfraPath);
 
-            IGSCloudService _IGSCloudService = new IGSCloudService(_cloudProviderFactory, @"D:\CloudInfra");
-            
-            
+
             // Create Test environment (Window & Linux VMs, SQL & MySQL RDS)
             var created = _IGSCloudService.CreateVirtualMachine(new VirtualMachine() { Type = VirtualMachineTypes.Linux },
                 CloudEnvironments.Test);
@@ -79,6 +78,19 @@ namespace Cloud_Library_Client
 
 
             Console.ReadLine();
+        }
+
+        private static void ConfigureServices(out string cloudInfraPath, out ICloudProviderFactory _cloudProviderFactory)
+        {
+            IConfiguration Configuration = new ConfigurationBuilder()
+                            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                            .Build();
+            cloudInfraPath = Configuration["CloudInfraPath"];
+            var serviceProvider = new ServiceCollection()
+            .AddCloudLibraryDI()
+            .BuildServiceProvider();
+
+            _cloudProviderFactory = serviceProvider.GetService<ICloudProviderFactory>();
         }
     }
 }
